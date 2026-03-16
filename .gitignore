@@ -9,6 +9,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Databricks
+.databricks
+
 # Folders
 # data/
 
@@ -95,3 +98,6 @@ dmypy.json
 # VS code configuration
 .vscode
 .history
+
+# Claude Code local settings
+.claude/settings.local.json

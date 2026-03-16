@@ -17,6 +17,7 @@ dependencies = [
     "openai==2.8.0",
     "databricks-mcp==0.4.0",
     "backoff==2.2.1",
+    "pyyaml==6.0.2",
     "mlflow==3.8.1",
     "nest-asyncio==1.6.0",
     "arxiv==2.3.1",
@@ -40,7 +41,7 @@ ci = ["pre-commit>=4.1.0, <5",
 include-package-data = true
 
 [tool.setuptools.package-data]
-"your_custom_package" = ["../../../project_config.yml"]
+"book_recommender" = ["project_config.yml"]
 
 [build-system]
 requires = ["setuptools>=72.0"]
@@ -48,7 +49,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["your_custom_package*"]
+include = ["book_recommender*"]
 
 [tool.setuptools.dynamic]
 version = { file = "version.txt" }
