@@ -1,9 +1,11 @@
 """Tests for ProjectConfig loading across all environments."""
 
+from pathlib import Path
+
 import pytest
+import yaml
 
 from book_recommender.config import ProjectConfig
-
 
 SAMPLE_CONFIG = {
     "dev": {
@@ -37,40 +39,38 @@ SAMPLE_CONFIG = {
 
 
 @pytest.fixture
-def config_file(tmp_path):
+def config_file(tmp_path: Path) -> Path:
     """Write a temporary project_config.yml and return its path."""
-    import yaml
-
     config_path = tmp_path / "project_config.yml"
     config_path.write_text(yaml.dump(SAMPLE_CONFIG))
     return config_path
 
 
 @pytest.mark.parametrize("env", ["dev", "stg", "prd"])
-def test_config_loads_for_all_environments(config_file, env):
+def test_config_loads_for_all_environments(config_file: Path, env: str) -> None:
     config = ProjectConfig.from_yaml(config_file, env=env)
     assert config.catalog == env
     assert config.schema_name == "book_recommender"
     assert config.volume == "summaries"
 
 
-def test_full_schema_name(config_file):
+def test_full_schema_name(config_file: Path) -> None:
     config = ProjectConfig.from_yaml(config_file, env="dev")
     assert config.full_schema_name == "dev.book_recommender"
 
 
-def test_full_volume_path(config_file):
+def test_full_volume_path(config_file: Path) -> None:
     config = ProjectConfig.from_yaml(config_file, env="dev")
     assert config.full_volume_path == "/Volumes/dev/book_recommender/summaries"
 
 
-def test_default_model_params(config_file):
+def test_default_model_params(config_file: Path) -> None:
     config = ProjectConfig.from_yaml(config_file, env="dev")
     assert config.temperature == 0.7
     assert config.max_tokens == 2000
     assert config.top_p == 0.95
 
 
-def test_invalid_environment_raises(config_file):
+def test_invalid_environment_raises(config_file: Path) -> None:
     with pytest.raises(ValueError, match="Environment 'prod' not found"):
         ProjectConfig.from_yaml(config_file, env="prod")

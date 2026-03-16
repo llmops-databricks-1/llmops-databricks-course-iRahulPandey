@@ -43,7 +43,7 @@ def list_volume_files(volume_path: str) -> list[Path]:
     return files
 
 
-def get_ingested_filenames(spark, table: str) -> set[str]:
+def get_ingested_filenames(spark: "SparkSession", table: str) -> set[str]:  # noqa: F821
     """Return the set of file_name values already in raw_documents."""
     try:
         existing = spark.table(table).select("file_name").distinct()
@@ -60,7 +60,8 @@ def parse_filename_metadata(filename: str) -> dict:
     Extract title and reading date from the file stem.
 
     Convention: YYYY-MM-DD_kebab-title.md
-      2018-04-01_godel-escher-bach.md  →  title="Godel Escher Bach", reading_date="2018-04-01"
+      2018-04-01_godel-escher-bach.md  →  title="Godel Escher Bach",
+                                          reading_date="2018-04-01"
       sapiens.md (no date)             →  title="Sapiens",            reading_date=None
     """
     stem = Path(filename).stem
@@ -78,7 +79,7 @@ def read_file_local(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def read_file_sdk(path: str, workspace_client) -> str:
+def read_file_sdk(path: str, workspace_client: "WorkspaceClient") -> str:  # noqa: F821
     """Fallback: read via Files API (local dev with databricks-connect)."""
     with workspace_client.files.download(path).contents as f:
         return f.read().decode("utf-8")
@@ -90,8 +91,8 @@ def read_file_sdk(path: str, workspace_client) -> str:
 # Sync
 # ---------------------------------------------------------------------------
 
-from pyspark.sql import SparkSession  # noqa: E402
 import pandas as pd  # noqa: E402
+from pyspark.sql import SparkSession  # noqa: E402
 
 spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {config.full_schema_name}")
@@ -100,6 +101,7 @@ target_table = f"{config.full_schema_name}.raw_documents"
 
 try:
     from databricks.sdk import WorkspaceClient  # noqa: PLC0415
+
     w = WorkspaceClient()
 except Exception:
     w = None

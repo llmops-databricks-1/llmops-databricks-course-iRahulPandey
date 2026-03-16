@@ -34,7 +34,7 @@ class ProjectConfig(BaseModel):
         return f"/Volumes/{self.catalog}/{self.schema_name}/{self.volume}"
 
     @classmethod
-    def from_yaml(cls, config_path: str | Path, env: str = "dev") -> "ProjectConfig":
+    def from_yaml(cls, config_path: str | Path, env: str = "dev") -> ProjectConfig:
         """Load config for *env* from *config_path*."""
         with open(config_path) as f:
             raw = yaml.safe_load(f)
