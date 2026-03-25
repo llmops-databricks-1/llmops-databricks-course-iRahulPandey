@@ -1,7 +1,7 @@
 resources:
   jobs:
-    hello_world_job:
-      name: hello-world
+    book_recommender_ingestion_job:
+      name: book-recommender-ingestion
       tags:
         project_name: "llmops-databricks-course-iRahulPandey"
 
@@ -13,10 +13,10 @@ resources:
               - ../dist/*.whl
 
       tasks:
-        - task_key: hello_world
+        - task_key: ingest_book_summaries
           environment_key: default
           notebook_task:
-            notebook_path: ../notebooks/hello_world.py
+            notebook_path: ../notebooks/1_book_summaries_ingestion.py
             base_parameters:
               env: ${bundle.target}
               git_sha: "${var.git_sha}"

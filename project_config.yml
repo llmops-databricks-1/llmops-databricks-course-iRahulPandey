@@ -1,0 +1,35 @@
+dev:
+  catalog: dev
+  schema_name: book_recommender
+  volume: summaries
+  llm_endpoint: databricks-llama-4-maverick
+  embedding_endpoint: databricks-gte-large-en
+  warehouse_id: "166b4b9f29a71c6a"
+  vector_search_endpoint: "" # fill in after creating VS endpoint
+  temperature: 0.7
+  max_tokens: 2000
+  top_p: 0.95
+
+stg:
+  catalog: stg
+  schema_name: book_recommender
+  volume: summaries
+  llm_endpoint: databricks-llama-4-maverick
+  embedding_endpoint: databricks-gte-large-en
+  warehouse_id: "166b4b9f29a71c6a"
+  vector_search_endpoint: ""
+  temperature: 0.7
+  max_tokens: 2000
+  top_p: 0.95
+
+prd:
+  catalog: prd
+  schema_name: book_recommender
+  volume: summaries
+  llm_endpoint: databricks-llama-4-maverick
+  embedding_endpoint: databricks-gte-large-en
+  warehouse_id: "166b4b9f29a71c6af"
+  vector_search_endpoint: ""
+  temperature: 0.7
+  max_tokens: 2000
+  top_p: 0.95
