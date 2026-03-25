@@ -129,9 +129,7 @@ except Exception:
 # Load only new documents
 raw_df = spark.table(source_table)
 new_docs = [
-    row.asDict()
-    for row in raw_df.collect()
-    if row["document_id"] not in chunked_ids
+    row.asDict() for row in raw_df.collect() if row["document_id"] not in chunked_ids
 ]
 logger.info(f"{len(new_docs)} new document(s) to chunk")
 
@@ -179,7 +177,10 @@ logger.info(f"chunked_documents: {total_chunks} chunks across {total_docs} docum
 # ---------------------------------------------------------------------------
 
 from databricks.sdk import WorkspaceClient  # noqa: E402
-from databricks.sdk.service.vectorsearch import EndpointStatusState, EndpointType  # noqa: E402
+from databricks.sdk.service.vectorsearch import (  # noqa: E402
+    EndpointStatusState,
+    EndpointType,
+)
 
 w = WorkspaceClient()
 
@@ -218,8 +219,7 @@ def _wait_for_endpoint_online(
             return
         time.sleep(poll_seconds)
     raise TimeoutError(
-        f"VS endpoint '{endpoint_name}' did not become ONLINE within "
-        f"{timeout_seconds}s."
+        f"VS endpoint '{endpoint_name}' did not become ONLINE within {timeout_seconds}s."
     )
 
 
@@ -241,9 +241,12 @@ from databricks.sdk.service.vectorsearch import (  # noqa: E402
 
 def get_or_create_vs_index(client: WorkspaceClient, cfg: "ProjectConfig") -> None:  # noqa: F821
     """Create a Delta Sync VS index if it does not exist, then trigger a sync."""
-    existing_names = {idx.name for idx in client.vector_search_indexes.list_indexes(
-        endpoint_name=cfg.vector_search_endpoint
-    )}
+    existing_names = {
+        idx.name
+        for idx in client.vector_search_indexes.list_indexes(
+            endpoint_name=cfg.vector_search_endpoint
+        )
+    }
 
     if cfg.full_vs_index_name not in existing_names:
         logger.info(f"Creating VS index '{cfg.full_vs_index_name}' ...")
@@ -265,9 +268,7 @@ def get_or_create_vs_index(client: WorkspaceClient, cfg: "ProjectConfig") -> Non
         )
         logger.info(f"VS index '{cfg.full_vs_index_name}' created")
     else:
-        logger.info(
-            f"VS index '{cfg.full_vs_index_name}' exists — triggering sync"
-        )
+        logger.info(f"VS index '{cfg.full_vs_index_name}' exists — triggering sync")
         client.vector_search_indexes.sync_index(cfg.full_vs_index_name)
         logger.info("Sync triggered")
 
