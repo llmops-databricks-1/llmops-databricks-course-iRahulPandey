@@ -19,6 +19,9 @@ class ProjectConfig(BaseModel):
     embedding_endpoint: str
     warehouse_id: str
     vector_search_endpoint: str
+    vector_search_index: str = "book_recommender_vs_index"
+    chunk_size: int = 2000
+    chunk_overlap: int = 200
     temperature: float = 0.7
     max_tokens: int = 2000
     top_p: float = 0.95
@@ -32,6 +35,11 @@ class ProjectConfig(BaseModel):
     def full_volume_path(self) -> str:
         """FUSE path to the summaries volume."""
         return f"/Volumes/{self.catalog}/{self.schema_name}/{self.volume}"
+
+    @property
+    def full_vs_index_name(self) -> str:
+        """Fully-qualified Vector Search index: <catalog>.<schema>.<index>."""
+        return f"{self.full_schema_name}.{self.vector_search_index}"
 
     @classmethod
     def from_yaml(cls, config_path: str | Path, env: str = "dev") -> ProjectConfig:
