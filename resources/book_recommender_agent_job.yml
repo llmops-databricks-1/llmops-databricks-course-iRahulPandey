@@ -1,0 +1,24 @@
+resources:
+  jobs:
+    book_recommender_agent_job:
+      name: book-recommender-agent
+      tags:
+        project_name: "llmops-databricks-course-iRahulPandey"
+        week: "3"
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: run_agent
+          environment_key: default
+          notebook_task:
+            notebook_path: ../notebooks/3_agent_with_vector_search.py
+            base_parameters:
+              env: ${bundle.target}
+              git_sha: "${var.git_sha}"
+              run_id: "{{job.run_id}}"
