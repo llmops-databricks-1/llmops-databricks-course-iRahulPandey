@@ -1,0 +1,23 @@
+resources:
+  jobs:
+    book_recommender_chunk_index_job:
+      name: book-recommender-chunk-and-index
+      tags:
+        project_name: "llmops-databricks-course-iRahulPandey"
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ../dist/*.whl
+
+      tasks:
+        - task_key: chunk_and_index
+          environment_key: default
+          notebook_task:
+            notebook_path: ../notebooks/2_chunk_and_index.py
+            base_parameters:
+              env: ${bundle.target}
+              git_sha: "${var.git_sha}"
+              run_id: "{{job.run_id}}"

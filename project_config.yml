@@ -5,7 +5,10 @@ dev:
   llm_endpoint: databricks-llama-4-maverick
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: "166b4b9f29a71c6a"
-  vector_search_endpoint: "" # fill in after creating VS endpoint
+  vector_search_endpoint: "book-recommender-vs"
+  vector_search_index: "book_recommender_vs_index"
+  chunk_size: 2000
+  chunk_overlap: 200
   temperature: 0.7
   max_tokens: 2000
   top_p: 0.95
@@ -17,7 +20,10 @@ stg:
   llm_endpoint: databricks-llama-4-maverick
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: "166b4b9f29a71c6a"
-  vector_search_endpoint: ""
+  vector_search_endpoint: "book-recommender-vs"
+  vector_search_index: "book_recommender_vs_index"
+  chunk_size: 2000
+  chunk_overlap: 200
   temperature: 0.7
   max_tokens: 2000
   top_p: 0.95
@@ -29,7 +35,10 @@ prd:
   llm_endpoint: databricks-llama-4-maverick
   embedding_endpoint: databricks-gte-large-en
   warehouse_id: "166b4b9f29a71c6af"
-  vector_search_endpoint: ""
+  vector_search_endpoint: "book-recommender-vs"
+  vector_search_index: "book_recommender_vs_index"
+  chunk_size: 2000
+  chunk_overlap: 200
   temperature: 0.7
   max_tokens: 2000
   top_p: 0.95
