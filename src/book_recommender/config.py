@@ -57,14 +57,12 @@ class ProjectConfig(BaseModel):
 def load_config(env: str | None = None) -> ProjectConfig:
     """Load ProjectConfig for the active environment.
 
-    Search order:
-    1. Bundled inside the installed package (works on Databricks after wheel install).
-    2. Root of the source tree (works in local dev without installing the wheel).
+    Loads from project_config.yml bundled inside the book_recommender package,
+    which works both in local dev and on Databricks after wheel install.
     """
     if env is None:
         env = get_env()
 
-    # 1. Prefer the copy baked into the wheel via importlib.resources
     try:
         from importlib.resources import files  # noqa: PLC0415
 
@@ -73,23 +71,15 @@ def load_config(env: str | None = None) -> ProjectConfig:
             raw = yaml.safe_load(f)
         if env not in raw:
             raise ValueError(
-                f"Environment '{env}' not found in bundled project_config.yml. "
+                f"Environment '{env}' not found in project_config.yml. "
                 f"Available: {list(raw.keys())}"
             )
         return ProjectConfig(**raw[env])
-    except (FileNotFoundError, TypeError):
-        pass
-
-    # 2. Fallback: walk up from __file__ (local dev, editable install)
-    for parent in Path(__file__).resolve().parents:
-        candidate = parent / "project_config.yml"
-        if candidate.exists():
-            return ProjectConfig.from_yaml(candidate, env=env)
-
-    raise FileNotFoundError(
-        "project_config.yml not found — ensure it is present at the project root "
-        "or rebuild the wheel after adding it to src/book_recommender/."
-    )
+    except (FileNotFoundError, TypeError, AttributeError) as e:
+        raise FileNotFoundError(
+            "project_config.yml not found inside book_recommender package. "
+            "Ensure pyproject.toml includes it in package-data and rebuild the wheel."
+        ) from e
 
 
 def get_env() -> str:
