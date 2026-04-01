@@ -1,4 +1,5 @@
 # Databricks notebook source
+# ruff: noqa: E402, F821
 """
 Week 3 — Book Recommender Agent with RAG
 
@@ -29,11 +30,6 @@ logger.info(f"VS Index   : {config.full_vs_index_name}")
 logger.info(f"LLM        : {config.llm_endpoint}")
 
 # COMMAND ----------
-
-# ---------------------------------------------------------------------------
-# Imports
-# ---------------------------------------------------------------------------
-
 import json
 from typing import Any
 
@@ -41,15 +37,14 @@ import mlflow
 from databricks.sdk import WorkspaceClient
 from databricks_langchain import ChatDatabricks
 from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.graph import START, END, StateGraph
+from langgraph.graph import END, START, StateGraph
+from typing_extensions import TypedDict
 
 # COMMAND ----------
 
 # ---------------------------------------------------------------------------
 # State Definition
 # ---------------------------------------------------------------------------
-
-from typing_extensions import TypedDict
 
 
 class AgentState(TypedDict):
@@ -100,13 +95,15 @@ def retrieve_summaries(query: str, num_results: int = 3) -> list[dict[str, Any]]
         summaries = []
 
         for row in results.result.data_array:
-            record = dict(zip(col_names, row))
-            summaries.append({
-                "title": record.get("title", "Unknown"),
-                "reading_date": record.get("reading_date", "N/A"),
-                "chunk_index": record.get("chunk_index", 0),
-                "excerpt": record.get("chunk_text", ""),
-            })
+            record = dict(zip(col_names, row, strict=False))
+            summaries.append(
+                {
+                    "title": record.get("title", "Unknown"),
+                    "reading_date": record.get("reading_date", "N/A"),
+                    "chunk_index": record.get("chunk_index", 0),
+                    "excerpt": record.get("chunk_text", ""),
+                }
+            )
 
         logger.info(f"Retrieved {len(summaries)} summaries")
         return summaries
@@ -155,25 +152,31 @@ def generation_node(state: AgentState) -> AgentState:
     summaries = state["retrieved_summaries"]
 
     # Build context from retrieved summaries
-    context = "\n\n".join([
-        f"Book: {s['title']} (Read: {s['reading_date']})\nExcerpt: {s['excerpt']}"
-        for s in summaries
-    ])
+    context = "\n\n".join(
+        [
+            f"Book: {s['title']} (Read: {s['reading_date']})\nExcerpt: {s['excerpt']}"
+            for s in summaries
+        ]
+    )
 
     # System prompt for book recommendations
-    system_prompt = """You are an expert book recommender who reads summaries and provides thoughtful recommendations.
-
-Given the user's query and relevant book summaries, provide:
-1. A concise analysis (2-3 sentences) of what the summaries reveal about the topic
-2. JSON array of book recommendations with this structure:
-{
-  "title": "Book Title",
-  "reason": "Why this book matches the user's interest based on the summary",
-  "key_insight": "One key takeaway from the summary"
-}
-
-Always cite specific sections from the summaries. Be honest - if summaries don't cover a topic well, say so.
-Return ONLY the JSON array, no other text."""
+    system_prompt = (
+        "You are an expert book recommender who reads summaries and "
+        "provides thoughtful recommendations.\n\n"
+        "Given the user's query and relevant book summaries, provide:\n"
+        "1. A concise analysis (2-3 sentences) of what the summaries "
+        "reveal about the topic\n"
+        "2. JSON array of book recommendations with this structure:\n"
+        "{\n"
+        '  "title": "Book Title",\n'
+        '  "reason": "Why this book matches the user\'s interest based '
+        'on the summary",\n'
+        '  "key_insight": "One key takeaway from the summary"\n'
+        "}\n\n"
+        "Always cite specific sections from the summaries. Be honest - "
+        "if summaries don't cover a topic well, say so.\n"
+        "Return ONLY the JSON array, no other text."
+    )
 
     # Build messages
     messages = [
@@ -271,12 +274,14 @@ def recommend_books(user_query: str) -> dict[str, Any]:
     logger.info(f"Processing query: {user_query}")
 
     # Run the graph
-    final_state = graph.invoke({
-        "user_query": user_query,
-        "retrieved_summaries": [],
-        "llm_response": "",
-        "recommendations": [],
-    })
+    final_state = graph.invoke(
+        {
+            "user_query": user_query,
+            "retrieved_summaries": [],
+            "llm_response": "",
+            "recommendations": [],
+        }
+    )
 
     return {
         "query": final_state["user_query"],
@@ -303,20 +308,24 @@ for i, query in enumerate(test_queries, 1):
     logger.info(f"Generated {result['books_recommended']} recommendations")
 
     # Display recommendations
-    display({  # noqa: F821
-        "query": result["query"],
-        "recommendations": result["recommendations"],
-    })
+    display(
+        {
+            "query": result["query"],
+            "recommendations": result["recommendations"],
+        }
+    )
 
 # COMMAND ----------
 
 logger.info("Agent testing complete!")
 
-display({  # noqa: F821
-    "agent_status": "ready",
-    "vs_index": config.full_vs_index_name,
-    "llm_endpoint": config.llm_endpoint,
-    "retrieval_top_k": 3,
-    "tracing": "enabled",
-    "graph_compiled": True,
-})
+display(
+    {
+        "agent_status": "ready",
+        "vs_index": config.full_vs_index_name,
+        "llm_endpoint": config.llm_endpoint,
+        "retrieval_top_k": 3,
+        "tracing": "enabled",
+        "graph_compiled": True,
+    }
+)
