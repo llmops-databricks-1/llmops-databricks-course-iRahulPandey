@@ -22,6 +22,10 @@ dependencies = [
     "nest-asyncio==1.6.0",
     "arxiv==2.3.1",
     "databricks-agents==1.8.2",
+    "langchain>=0.3.0,<1",
+    "langchain-community>=0.3.0,<1",
+    "langgraph>=0.1.0,<1",
+    "databricks-langchain>=0.3.0,<1",
     "psycopg==3.3.2",
     "psycopg-pool==3.3.0",
     "psycopg[binary]==3.3.2"
